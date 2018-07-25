@@ -26,8 +26,6 @@
 #define VGA_PAL		0
 #define MIRC_PAL	1
 
-#define DEFAULT_WIDTH	60
-
 typedef struct block_s {
 	int color;
 } block_t;
@@ -48,7 +46,7 @@ main(int argc, char *argv[])
 	int format = ANSI_FMT;
 	int palette = VGA_PAL;
 	bool resize = false;
-	long resize_width = DEFAULT_WIDTH;
+	long resize_width = 0;
 	long resize_height = 0;
 
 	int ch = 0;
@@ -333,11 +331,11 @@ usage(void)
 {
 	fprintf(stderr, "usage: p2a [options] input\n");
 	fprintf(stderr, "\n");
-	fprintf(stderr, "-b percent     adjust brightness levels");
-	fprintf(stderr, "-f a|m         specify output format ANSI or mirc, default is ANSI.");
-	fprintf(stderr, "-p m|v         specify palette to use, mirc or VGA, default is VGA");
-	fprintf(stderr, "-s percent     adjust saturation levels");
-	fprintf(stderr, "-w width       specify output width, default is %d\n", DEFAULT_WIDTH);
+	fprintf(stderr, "-b percent     Adjust brightness levels, default is 100.");
+	fprintf(stderr, "-f a|m         Specify output format ANSI or mirc, default is ANSI.");
+	fprintf(stderr, "-p m|v         Specify palette to use, mirc or VGA, default is VGA");
+	fprintf(stderr, "-s percent     Adjust saturation levels, default is 100.");
+	fprintf(stderr, "-w width       Specify output width, default is the image width.\n");
 	fprintf(stderr, "\n");
 	exit(1);
 }
