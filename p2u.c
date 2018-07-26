@@ -46,6 +46,7 @@ main(int argc, char *argv[])
 
 	int format = ANSI_FMT;
 	int palette = VGA_PAL;
+	bool cp437 = false;
 	bool resize = false;
 	long resize_width = 0;
 	long resize_height = 0;
@@ -71,6 +72,10 @@ main(int argc, char *argv[])
 				switch (optarg[0]) {
 					case 'a':
 						format = ANSI_FMT;
+						break;
+					case 'd':
+						format = ANSI_FMT;
+						cp437 = true;
 						break;
 					case 'm':
 						format = MIRC_FMT;
@@ -228,7 +233,7 @@ main(int argc, char *argv[])
 				if (bg == fg) {
 					printf(" ");
 				} else {
-					printf("▀");
+					cp437 ? printf("\xdf") : printf("▀");
 				}
 			} else {
 				/* XXX we dont really have to print both attrs */
@@ -236,10 +241,10 @@ main(int argc, char *argv[])
 					printf("\x1b[%d;%dm%s",
 						fg < 8 ? fg + 30 : fg - 8 + 90,
 						bg < 8 ? bg + 40 : bg - 8 + 100,
-						bg == fg ? " " : "▀");
+						bg == fg ? " " : cp437 ? "\xdf" : "▀");
 				} else {
 					printf("\x03%d,%d%s", fg, bg,
-					       bg == fg ? " " : "▀");
+					       bg == fg ? " " : cp437 ? "\xdf" : "▀");
 				}
 			}
 			lbg = bg;
@@ -400,7 +405,8 @@ usage(void)
 	fprintf(stderr, "usage: p2u [options] input\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "-b percent     Adjust brightness levels, default is 100.\n");
-	fprintf(stderr, "-f a|m         Specify output format ANSI or mirc, default is ANSI.\n");
+	fprintf(stderr, "-f a|d|e|m     Specify output format ANSI, DOS (ANSI with");
+	fprintf(stderrm "               CP437 characters), emoji or mirc.  Default is ANSI.\n");
 	fprintf(stderr, "-p m|v         Specify palette to use, mirc or VGA, default is VGA.\n");
 	fprintf(stderr, "-s percent     Adjust saturation levels, default is 100.\n");
 	fprintf(stderr, "-w width       Specify output width, default is the image width.\n");
