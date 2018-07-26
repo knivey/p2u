@@ -61,6 +61,7 @@ main(int argc, char *argv[])
 	int format = ANSI_FMT;
 	int palette = VGA_PAL;
 	bool cp437 = false;
+	bool useice = false;
 	bool resize = false;
 	long resize_width = 0;
 	long resize_height = 0;
@@ -90,6 +91,7 @@ main(int argc, char *argv[])
 					case 'd':
 						format = ANSI_FMT;
 						cp437 = true;
+						useice = true;
 						break;
 					case 'm':
 						format = MIRC_FMT;
@@ -255,10 +257,25 @@ main(int argc, char *argv[])
 			} else {
 				/* XXX we dont really have to print both attrs */
 				if (format == ANSI_FMT) {
+					if (useice) {
+						printf("\x1b[%s%d;%dm%s\n",
+							/* bold and ice */
+							(fg > 7 && bg > 7) ? "1;5;" :
+							/* bold only */
+							(fg > 7 && bg < 8) ? "1;" :
+							/* ice only */
+							(fg < 8 && bg > 7) ? "5;" :
+							/* neither */
+							"",
+							fg > 7 ? fg - 8 : fg,
+							bg > 7 ? bg - 8 : fg,
+							bg == fg ? " " : cp437 ? "\xdf" : "▀");
+					} else {
 					printf("\x1b[%d;%dm%s",
 						fg < 8 ? fg + 30 : fg - 8 + 90,
 						bg < 8 ? bg + 40 : bg - 8 + 100,
 						bg == fg ? " " : cp437 ? "\xdf" : "▀");
+					}
 				} else {
 					printf("\x03%d,%d%s", fg, bg,
 					       bg == fg ? " " : cp437 ? "\xdf" : "▀");
@@ -269,7 +286,7 @@ main(int argc, char *argv[])
 		}
 		/* reset to prevent line bleeding on terms */
 		if (format == ANSI_FMT) {
-			printf("\x1b[39;49m\n");
+			printf("\x1b[0m\n");
 		} else {
 			printf("\n");
 		}
