@@ -136,6 +136,9 @@ main(int argc, char *argv[])
 	/* handle alpha eventually */
 	pixel = stbi_loadf(argv[0], &width, &height, &channels, STBI_rgb);
 
+	if (!pixel) {
+		usage();
+	}
 
 	if (resize) {
 		resize_height = height * resize_width / width;
