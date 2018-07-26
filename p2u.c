@@ -420,7 +420,7 @@ usage(void)
 	fprintf(stderr, "\n");
 	fprintf(stderr, "-b percent     Adjust brightness levels, default is 100.\n");
 	fprintf(stderr, "-f a|d|e|m     Specify output format ANSI, DOS (ANSI with");
-	fprintf(stderrm "               CP437 characters), emoji or mirc.  Default is ANSI.\n");
+	fprintf(stderr, "               CP437 characters), emoji or mirc.  Default is ANSI.\n");
 	fprintf(stderr, "-p m|v         Specify palette to use, mirc or VGA, default is VGA.\n");
 	fprintf(stderr, "-s percent     Adjust saturation levels, default is 100.\n");
 	fprintf(stderr, "-w width       Specify output width, default is the image width.\n");
