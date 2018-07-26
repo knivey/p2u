@@ -258,7 +258,7 @@ main(int argc, char *argv[])
 				/* XXX we dont really have to print both attrs */
 				if (format == ANSI_FMT) {
 					if (useice) {
-						printf("\x1b[%s%d;%dm%s\n",
+						printf("\x1b[%s%d;%dm%s",
 							/* bold and ice */
 							(fg > 7 && bg > 7) ? "1;5;" :
 							/* bold only */
