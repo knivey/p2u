@@ -267,8 +267,8 @@ main(int argc, char *argv[])
 							(fg < 8 && bg > 7) ? "5;" :
 							/* neither */
 							"",
-							fg > 7 ? fg - 8 : fg,
-							bg > 7 ? bg - 8 : fg,
+							fg > 7 ? fg - 8 + 30 : fg + 30,
+							bg > 7 ? bg - 8 + 40 : bg + 40,
 							bg == fg ? " " : cp437 ? "\xdf" : "▀");
 					} else {
 					printf("\x1b[%d;%dm%s",
