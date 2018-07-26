@@ -286,7 +286,7 @@ main(int argc, char *argv[])
 		}
 		/* reset to prevent line bleeding on terms */
 		if (format == ANSI_FMT) {
-			printf("\x1b[0m\n");
+			printf("\x1b[0m%s", cp437 ? "\r\n" : "\n");
 		} else {
 			printf("\n");
 		}
