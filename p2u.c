@@ -310,7 +310,6 @@ tweak(float *pixel, float sat, float lum)
 	l *= lum * 0.01f;
 
 	/* convert from hsl to rgb */
-
 	if (s == 0.0f) {
 		r = g = b = l;
 	} else {
@@ -321,15 +320,16 @@ tweak(float *pixel, float sat, float lum)
 		b = huetorgb(p, q, h - 1.0f/3.0f);
 	}
 
-	pixel[R] = r;
-	pixel[G] = g;
-	pixel[B] = b;
+	/* clamp values */
+	pixel[R] = r < 0.0f ? 0.0f : r > 1.0f ? 1.0f : r;
+	pixel[G] = g < 0.0f ? 0.0f : g > 1.0f ? 1.0f : g;
+	pixel[B] = b < 0.0f ? 0.0f : b > 1.0f ? 1.0f : b;
 }
 
 void
 usage(void)
 {
-	fprintf(stderr, "usage: p2a [options] input\n");
+	fprintf(stderr, "usage: p2u [options] input\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "-b percent     Adjust brightness levels, default is 100.\n");
 	fprintf(stderr, "-f a|m         Specify output format ANSI or mirc, default is ANSI.\n");
