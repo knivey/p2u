@@ -22,6 +22,7 @@
 
 #define ANSI_FMT	0
 #define MIRC_FMT	1
+#define EMOJI_FMT	2
 
 #define VGA_PAL		0
 #define MIRC_PAL	1
@@ -74,6 +75,9 @@ main(int argc, char *argv[])
 					case 'm':
 						format = MIRC_FMT;
 						break;
+					case 'e':
+						format = EMOJI_FMT;
+						break;
 					default:
 						usage();
 						break;
@@ -113,11 +117,12 @@ main(int argc, char *argv[])
 	/* handle alpha eventually */
 	pixel = stbi_loadf(argv[0], &width, &height, &channels, STBI_rgb);
 
-	resize_height = height * resize_width / width;
-
-	resized = malloc(sizeof(float) * resize_width * resize_height * channels);
 
 	if (resize) {
+		resize_height = height * resize_width / width;
+
+		resized = malloc(sizeof(float) * resize_width * resize_height * channels);
+
 		stbir_resize_float(pixel, width, height, 0,
 				   resized, resize_width, resize_height, 0,
 				   channels);
@@ -140,6 +145,10 @@ main(int argc, char *argv[])
 
 	block = malloc(sizeof(block_t) * height * width);
 
+	if (format == EMOJI_FMT) {
+		palette = VGA_PAL;
+	}
+
 	for (int i = 0; i < height; i++) {
 		for (int j = 0; j < width; j++) {
 			block[(width * i) + j].color =
@@ -148,6 +157,65 @@ main(int argc, char *argv[])
 		}
 	}
 	free(pixel);
+
+	if (format == EMOJI_FMT) {
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				switch (block[(width * i) + j].color) {
+					case 0:
+						printf("%s", "⬛");
+						break;
+					case 1:
+						printf("%s", "🔴");
+						break;
+					case 2:
+						printf("%s", "💚");
+						break;
+					case 3:
+						printf("%s", "💩");
+						break;
+					case 4:
+						printf("%s", "💙");
+						break;
+					case 5:
+						printf("%s", "💜");
+						break;
+					case 6:
+						printf("%s", "📫");
+						break;
+					case 7:
+						printf("%s", "👽");
+						break;
+					case 8:
+						printf("%s", "💣");
+						break;
+					case 9:
+						printf("%s", "🧠");
+						break;
+					case 10:
+						printf("%s", "🎾");
+						break;
+					case 11:
+						printf("%s", "🌞");
+						break;
+					case 12:
+						printf("%s", "♿");
+						break;
+					case 13:
+						printf("%s", "🐷");
+						break;
+					case 14:
+						printf("%s", "💦");
+						break;
+					case 15:
+						printf("%s", "💭");
+						break;
+				}
+			}
+			printf("\n");
+		}
+		return 0;
+	}
 
 	for (int i = 0; i + 1 < height; i += 2) {
 		for (int j = 0; j < width; j++) {
