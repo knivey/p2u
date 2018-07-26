@@ -182,52 +182,52 @@ main(int argc, char *argv[])
 			for (int j = 0; j < width; j++) {
 				switch (block[(width * i) + j].color) {
 					case 0:
-						printf("%s", "⬛");
+						printf("⬛");
 						break;
 					case 1:
-						printf("%s", "🔴");
+						printf("🔴");
 						break;
 					case 2:
-						printf("%s", "💚");
+						printf("💚");
 						break;
 					case 3:
-						printf("%s", "💩");
+						printf("💩");
 						break;
 					case 4:
-						printf("%s", "💙");
+						printf("💙");
 						break;
 					case 5:
-						printf("%s", "💜");
+						printf("💜");
 						break;
 					case 6:
-						printf("%s", "📫");
+						printf("📫");
 						break;
 					case 7:
-						printf("%s", "👽");
+						printf("👽");
 						break;
 					case 8:
-						printf("%s", "💣");
+						printf("💣");
 						break;
 					case 9:
-						printf("%s", "🧠");
+						printf("🧠");
 						break;
 					case 10:
-						printf("%s", "🎾");
+						printf("🎾");
 						break;
 					case 11:
-						printf("%s", "🌞");
+						printf("🌞");
 						break;
 					case 12:
-						printf("%s", "♿");
+						printf("♿");
 						break;
 					case 13:
-						printf("%s", "🐷");
+						printf("🐷");
 						break;
 					case 14:
-						printf("%s", "💦");
+						printf("💦");
 						break;
 					case 15:
-						printf("%s", "💭");
+						printf("💭");
 						break;
 				}
 			}
@@ -243,7 +243,7 @@ main(int argc, char *argv[])
 
 			/* dont print color codes if we dont have to */
 			if (j != 0 && lbg == bg && lfg == fg) {
-				/* try to save 3 bytes */
+				/* try to save bytes */
 				if (bg == fg) {
 					printf(" ");
 				} else {
