@@ -60,9 +60,11 @@ main(int argc, char *argv[])
 
 	int format = ANSI_FMT;
 	int palette = VGA_PAL;
+
 	bool cp437 = false;
 	bool useice = false;
 	bool resize = false;
+
 	long resize_width = 0;
 	long resize_height = 0;
 
@@ -78,7 +80,9 @@ main(int argc, char *argv[])
 	float brightness = 100.0f;
 	float saturation = 100.0f;
 
-	while((ch = getopt(argc, argv, "b:f:p:w:s:")) != -1) {
+	bool verbose = false;
+
+	while((ch = getopt(argc, argv, "b:f:p:s:w:v")) != -1) {
 		switch (ch) {
 			case 'b':
 				brightness = strtof(optarg, NULL);
@@ -124,6 +128,9 @@ main(int argc, char *argv[])
 				resize_width = strtol(optarg, NULL, 10);
 				resize = true;
 				break;
+			case 'v':
+				verbose = true;
+				break;
 			default:
 				usage();
 		}
@@ -135,7 +142,8 @@ main(int argc, char *argv[])
 		usage();
 	}
 
-	/* handle alpha eventually */
+	/* XXX handle alpha eventually */
+	/* channels is the number of channels in the original file, not our buffer) */
 	pixel = stbi_loadf(argv[0], &width, &height, &channels, STBI_rgb);
 
 	if (!pixel) {
@@ -145,11 +153,12 @@ main(int argc, char *argv[])
 	if (resize) {
 		resize_height = height * resize_width / width;
 
-		resized = malloc(sizeof(float) * resize_width * resize_height * channels);
+		resized = malloc(sizeof(float) * resize_width * resize_height * STBI_rgb);
 
+		printf("resizing to %ldx%ld %d chans\n", resize_width, resize_height, STBI_rgb);
 		stbir_resize_float(pixel, width, height, 0,
 				   resized, resize_width, resize_height, 0,
-				   channels);
+				   STBI_rgb);
 
 		free(pixel);
 
@@ -158,10 +167,34 @@ main(int argc, char *argv[])
 		height = resize_height;
 	}
 
+	if (!pixel) {
+		usage();
+	}
+
+	if (verbose) {
+		fprintf(stderr, "file: %s\n", argv[0]);
+		fprintf(stderr, "format: %s\n", format == ANSI_FMT ? "ANSI" :
+						format == MIRC_FMT ? "mIRC" :
+						"emoji");
+		fprintf(stderr, "palette: %s\n", palette == VGA_PAL ? "VGA" : "mIRC");
+
+		if (format == ANSI_FMT) {
+			fprintf(stderr, "iCE: %s\n", useice ? "true" : "false");
+			fprintf(stderr, "CP437: %s\n", cp437 ? "true" : "false");
+		}
+
+		fprintf(stderr, "resized: %s\n", resize ? "true" : "false");
+		fprintf(stderr, "geometry: %dx%d\n", width, height);
+		fprintf(stderr, "channels: %d\n", STBI_rgb);
+
+		fprintf(stderr, "saturation: %f\n", saturation);
+		fprintf(stderr, "brightness: %f\n", brightness);
+	}
+
 	if (brightness != 100.0f || saturation != 100.0f) {
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
-				tweak(&pixel[((width * i) + j) * channels],
+				tweak(&pixel[((width * i) + j) * STBI_rgb],
 				      saturation, brightness);
 			}
 		}
@@ -176,7 +209,7 @@ main(int argc, char *argv[])
 	for (int i = 0; i < height; i++) {
 		for (int j = 0; j < width; j++) {
 			block[(width * i) + j].color =
-			nearestcolor(&pixel[((width * i) + j) * channels],
+			nearestcolor(&pixel[((width * i) + j) * STBI_rgb],
 				     palette);
 		}
 	}
@@ -286,7 +319,7 @@ main(int argc, char *argv[])
 		}
 		/* reset to prevent line bleeding on terms */
 		if (format == ANSI_FMT) {
-			printf("\x1b[0m%s", width == 80 ? "" : cp437 ? "\r\n" : "\n");
+			printf("\x1b[0m%s", cp437 && width == 80 ? "" : "\n");
 		} else {
 			printf("\n");
 		}
@@ -439,7 +472,7 @@ usage(void)
 	fprintf(stderr, "usage: p2u [options] input\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "-b percent     Adjust brightness levels, default is 100.\n");
-	fprintf(stderr, "-f a|d|e|m     Specify output format ANSI, DOS (ANSI with");
+	fprintf(stderr, "-f a|d|e|m     Specify output format ANSI, DOS (ANSI with\n");
 	fprintf(stderr, "               CP437 characters), emoji or mirc.  Default is ANSI.\n");
 	fprintf(stderr, "-p m|v         Specify palette to use, mirc or VGA, default is VGA.\n");
 	fprintf(stderr, "-s percent     Adjust saturation levels, default is 100.\n");
