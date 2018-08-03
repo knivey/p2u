@@ -155,7 +155,6 @@ main(int argc, char *argv[])
 
 		resized = malloc(sizeof(float) * resize_width * resize_height * STBI_rgb);
 
-		printf("resizing to %ldx%ld %d chans\n", resize_width, resize_height, STBI_rgb);
 		stbir_resize_float(pixel, width, height, 0,
 				   resized, resize_width, resize_height, 0,
 				   STBI_rgb);

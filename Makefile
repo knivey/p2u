@@ -7,7 +7,7 @@ PREFIX ?= /usr/local
 
 UNAME := $(shell sh -c 'uname -s 2>/dev/null')
 
-ifeq ($(UNAME),Darwin)
+ifeq ($(UNAME), Darwin)
 	CC := clang
 	CFLAGS += -Wunused-result -Wunused-value
 endif
@@ -18,8 +18,8 @@ default:
 .PHONY: install clean
 
 install:
-	install -d 0755 $(PREFIX)/bin/
-	install -m 0755 $(PROG) $(PREFIX)/bin/$(PROG)
+	mkdir $(PREFIX)/bin/
+	cp $(PROG) $(PREFIX)/bin/$(PROG)
 
 clean:
 	rm -rf $(PROG) $(PROG).dSYM
