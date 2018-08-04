@@ -18,7 +18,6 @@ default:
 .PHONY: install clean
 
 install:
-	mkdir $(PREFIX)/bin/
 	cp $(PROG) $(PREFIX)/bin/$(PROG)
 
 clean:

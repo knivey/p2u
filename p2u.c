@@ -40,6 +40,7 @@
 
 #define VGA_PAL		0
 #define MIRC_PAL	1
+#define XIRC_PAL	2
 
 typedef struct block_s {
 	int color;
@@ -115,6 +116,9 @@ main(int argc, char *argv[])
 						break;
 					case 'v':
 						palette = VGA_PAL;
+						break;
+					case 'x':
+						palette = XIRC_PAL;
 						break;
 					default:
 						usage();
@@ -365,6 +369,106 @@ nearestcolor(float *pixel, int palette)
 				     {0.50f, 0.50f, 0.50f},
 				     {0.82f, 0.82f, 0.82f}};
 
+	float xirc_palette[99][3] = {{1.00f, 1.00f, 1.00f},
+				     {0.00f, 0.00f, 0.00f},
+				     {0.00f, 0.00f, 0.50f},
+				     {0.00f, 0.57f, 0.00f},
+				     {1.00f, 0.00f, 0.00f},
+				     {0.50f, 0.00f, 0.00f},
+				     {0.61f, 0.00f, 0.61f},
+				     {0.98f, 0.50f, 0.00f},
+				     {1.00f, 1.00f, 0.00f},
+				     {0.00f, 0.98f, 0.00f},
+				     {0.00f, 0.57f, 0.57f},
+				     {0.00f, 1.00f, 1.00f},
+				     {0.00f, 0.33f, 0.98f},
+				     {1.00f, 0.00f, 1.00f},
+				     {0.50f, 0.50f, 0.50f},
+				     {0.82f, 0.82f, 0.82f},
+				     {0.28f, 0.00f, 0.00f},
+				     {0.28f, 0.13f, 0.00f},
+				     {0.28f, 0.28f, 0.00f},
+				     {0.20f, 0.28f, 0.00f},
+				     {0.00f, 0.28f, 0.00f},
+				     {0.00f, 0.28f, 0.17f},
+				     {0.00f, 0.28f, 0.28f},
+				     {0.00f, 0.15f, 0.28f},
+				     {0.00f, 0.00f, 0.28f},
+				     {0.18f, 0.00f, 0.28f},
+				     {0.28f, 0.00f, 0.28f},
+				     {0.28f, 0.00f, 0.16f},
+				     {0.45f, 0.00f, 0.00f},
+				     {0.45f, 0.23f, 0.00f},
+				     {0.45f, 0.45f, 0.00f},
+				     {0.32f, 0.45f, 0.00f},
+				     {0.00f, 0.45f, 0.00f},
+				     {0.00f, 0.45f, 0.29f},
+				     {0.00f, 0.45f, 0.45f},
+				     {0.00f, 0.25f, 0.45f},
+				     {0.00f, 0.00f, 0.45f},
+				     {0.29f, 0.00f, 0.45f},
+				     {0.45f, 0.00f, 0.45f},
+				     {0.45f, 0.00f, 0.27f},
+				     {0.71f, 0.00f, 0.00f},
+				     {0.71f, 0.39f, 0.00f},
+				     {0.71f, 0.71f, 0.00f},
+				     {0.49f, 0.71f, 0.00f},
+				     {0.00f, 0.71f, 0.00f},
+				     {0.00f, 0.71f, 0.44f},
+				     {0.00f, 0.71f, 0.71f},
+				     {0.00f, 0.39f, 0.71f},
+				     {0.00f, 0.00f, 0.71f},
+				     {0.46f, 0.00f, 0.71f},
+				     {0.71f, 0.00f, 0.71f},
+				     {0.71f, 0.00f, 0.42f},
+				     {1.00f, 0.00f, 0.00f},
+				     {1.00f, 0.55f, 0.00f},
+				     {1.00f, 1.00f, 0.00f},
+				     {0.70f, 1.00f, 0.00f},
+				     {0.00f, 1.00f, 0.00f},
+				     {0.00f, 1.00f, 0.63f},
+				     {0.00f, 1.00f, 1.00f},
+				     {0.00f, 0.55f, 1.00f},
+				     {0.00f, 0.00f, 1.00f},
+				     {0.65f, 0.00f, 1.00f},
+				     {1.00f, 0.00f, 1.00f},
+				     {1.00f, 0.00f, 0.60f},
+				     {1.00f, 0.35f, 0.35f},
+				     {1.00f, 0.71f, 0.35f},
+				     {1.00f, 1.00f, 0.44f},
+				     {0.81f, 1.00f, 0.38f},
+				     {0.44f, 1.00f, 0.44f},
+				     {0.40f, 1.00f, 0.79f},
+				     {0.43f, 1.00f, 1.00f},
+				     {0.35f, 0.71f, 1.00f},
+				     {0.35f, 0.35f, 1.00f},
+				     {0.77f, 0.35f, 1.00f},
+				     {1.00f, 0.40f, 1.00f},
+				     {1.00f, 0.35f, 0.74f},
+				     {1.00f, 0.61f, 0.61f},
+				     {1.00f, 0.83f, 0.61f},
+				     {1.00f, 1.00f, 0.61f},
+				     {0.89f, 1.00f, 0.61f},
+				     {0.61f, 1.00f, 0.61f},
+				     {0.61f, 1.00f, 0.86f},
+				     {0.61f, 1.00f, 1.00f},
+				     {0.61f, 0.83f, 1.00f},
+				     {0.61f, 0.61f, 1.00f},
+				     {0.86f, 0.61f, 1.00f},
+				     {1.00f, 0.61f, 1.00f},
+				     {1.00f, 0.58f, 0.83f},
+				     {0.00f, 0.00f, 0.00f},
+				     {0.07f, 0.07f, 0.07f},
+				     {0.16f, 0.16f, 0.16f},
+				     {0.21f, 0.21f, 0.21f},
+				     {0.30f, 0.30f, 0.30f},
+				     {0.40f, 0.40f, 0.40f},
+				     {0.51f, 0.51f, 0.51f},
+				     {0.62f, 0.62f, 0.62f},
+				     {0.74f, 0.74f, 0.74f},
+				     {0.89f, 0.89f, 0.89f},
+				     {1.00f, 1.00f, 1.00f}};
+
 	float delta = 10;
 	int color = 0;
 
@@ -375,10 +479,17 @@ nearestcolor(float *pixel, int palette)
 				color = i;
 			}
 		}
-	} else {
+	} else if (palette == VGA_PAL) {
 		for (int i = 0; i < 16; i++) {
 			if (DIST(pixel, vga_palette[i]) < delta) {
 				delta = DIST(pixel, vga_palette[i]);
+				color = i;
+			}
+		}
+	} else {/* XIRC_PAL */
+		for (int i = 0; i < 99; i++) {
+			if (DIST(pixel, xirc_palette[i]) < delta) {
+				delta = DIST(pixel, xirc_palette[i]);
 				color = i;
 			}
 		}
@@ -473,7 +584,8 @@ usage(void)
 	fprintf(stderr, "-b percent     Adjust brightness levels, default is 100.\n");
 	fprintf(stderr, "-f a|d|e|m     Specify output format ANSI, DOS (ANSI with\n");
 	fprintf(stderr, "               CP437 characters), emoji or mirc.  Default is ANSI.\n");
-	fprintf(stderr, "-p m|v         Specify palette to use, mirc or VGA, default is VGA.\n");
+	fprintf(stderr, "-p m|v|x       Specify palette to use, mirc, VGA, or extended mirc.\n");
+	fprintf(stderr, "               default is VGA.\n");
 	fprintf(stderr, "-s percent     Adjust saturation levels, default is 100.\n");
 	fprintf(stderr, "-w width       Specify output width, default is the image width.\n");
 	fprintf(stderr, "\n");
