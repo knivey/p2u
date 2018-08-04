@@ -29,6 +29,7 @@
 #define R	0
 #define G	1
 #define B	2
+#define A	3
 
 #define DIST(x, y)	fabs(sqrtf((x[R] - y[R]) * (x[R] - y[R]) + \
 				   (x[G] - y[G]) * (x[G] - y[G]) + \
@@ -47,8 +48,8 @@ typedef struct block_s {
 } block_t;
 
 void usage(void);
-int nearestcolor(float *pixel, int palette);
-float huetorgb(float p, float q, float t);
+int nearestcolor(float *pixel, int palette, float tlevel);
+double huetorgb(double p, double q, double t);
 void tweak(float *pixel, float sat, float lum);
 
 int
@@ -80,10 +81,11 @@ main(int argc, char *argv[])
 
 	float brightness = 100.0f;
 	float saturation = 100.0f;
+	float tlevel = 0.5f;
 
 	bool verbose = false;
 
-	while((ch = getopt(argc, argv, "b:f:p:s:w:v")) != -1) {
+	while((ch = getopt(argc, argv, "b:f:p:s:t:w:v")) != -1) {
 		switch (ch) {
 			case 'b':
 				brightness = strtof(optarg, NULL);
@@ -128,6 +130,9 @@ main(int argc, char *argv[])
 			case 's':
 				saturation = strtof(optarg, NULL);
 				break;
+			case 't':
+				tlevel = strtof(optarg, NULL);
+				break;
 			case 'w':
 				resize_width = strtol(optarg, NULL, 10);
 				resize = true;
@@ -148,20 +153,21 @@ main(int argc, char *argv[])
 
 	/* XXX handle alpha eventually */
 	/* channels is the number of channels in the original file, not our buffer) */
-	pixel = stbi_loadf(argv[0], &width, &height, &channels, STBI_rgb);
+	pixel = stbi_loadf(argv[0], &width, &height, &channels, STBI_rgb_alpha);
 
 	if (!pixel) {
+		fprintf(stderr, "Unable to read file: %s\n", argv[0]);
 		usage();
 	}
 
 	if (resize) {
 		resize_height = height * resize_width / width;
 
-		resized = malloc(sizeof(float) * resize_width * resize_height * STBI_rgb);
+		resized = malloc(sizeof(float) * resize_width * resize_height * STBI_rgb_alpha);
 
 		stbir_resize_float(pixel, width, height, 0,
 				   resized, resize_width, resize_height, 0,
-				   STBI_rgb);
+				   STBI_rgb_alpha);
 
 		free(pixel);
 
@@ -197,7 +203,7 @@ main(int argc, char *argv[])
 	if (brightness != 100.0f || saturation != 100.0f) {
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
-				tweak(&pixel[((width * i) + j) * STBI_rgb],
+				tweak(&pixel[((width * i) + j) * STBI_rgb_alpha],
 				      saturation, brightness);
 			}
 		}
@@ -212,8 +218,8 @@ main(int argc, char *argv[])
 	for (int i = 0; i < height; i++) {
 		for (int j = 0; j < width; j++) {
 			block[(width * i) + j].color =
-			nearestcolor(&pixel[((width * i) + j) * STBI_rgb],
-				     palette);
+			nearestcolor(&pixel[((width * i) + j) * STBI_rgb_alpha],
+				     palette, tlevel);
 		}
 	}
 	free(pixel);
@@ -270,6 +276,10 @@ main(int argc, char *argv[])
 					case 15:
 						printf("💭");
 						break;
+					/* transparent */
+					case -1:
+						printf(" ");
+						break;
 				}
 			}
 			printf("\n");
@@ -292,6 +302,7 @@ main(int argc, char *argv[])
 				}
 			} else {
 				/* XXX we dont really have to print both attrs */
+				/* XXX not handling alpha here either */
 				if (format == ANSI_FMT) {
 					if (useice) {
 						printf("\x1b[%s%d;%dm%s",
@@ -307,14 +318,23 @@ main(int argc, char *argv[])
 							bg > 7 ? bg - 8 + 40 : bg + 40,
 							bg == fg ? " " : cp437 ? "\xdf" : "▀");
 					} else {
+					/* XXX this doesnt work for extended colors */
 					printf("\x1b[%d;%dm%s",
 						fg < 8 ? fg + 30 : fg - 8 + 90,
 						bg < 8 ? bg + 40 : bg - 8 + 100,
 						bg == fg ? " " : cp437 ? "\xdf" : "▀");
 					}
 				} else {
-					printf("\x03%d,%d%s", fg, bg,
-					       bg == fg ? " " : cp437 ? "\xdf" : "▀");
+					if (bg == -1 && fg != -1) {
+						printf("\x03%d%s", fg, cp437 ? "\xdf" : "▀");
+					} else if (fg == -1 && bg != -1) {
+						printf("\x03%d%s", bg, cp437 ? "\xdc" : "▄");
+					} else if (fg == -1 && bg == -1) {
+						printf("\x03 ");
+					} else {
+						printf("\x03%d,%d%s", fg, bg,
+						       bg == fg ? " " : cp437 ? "\xdf" : "▀");
+					}
 				}
 			}
 			lbg = bg;
@@ -331,9 +351,12 @@ main(int argc, char *argv[])
 }
 
 int
-nearestcolor(float *pixel, int palette)
+nearestcolor(float *pixel, int palette, float tlevel)
 {
 
+	if (pixel[A] < tlevel) {
+		return -1;
+	}
 	/* vga palette, maybe add more */
 	float vga_palette[16][3] = {{0.00f, 0.00f, 0.00f},
 				    {0.66f, 0.00f, 0.00f},
@@ -486,7 +509,7 @@ nearestcolor(float *pixel, int palette)
 				color = i;
 			}
 		}
-	} else {/* XIRC_PAL */
+	} else { /* XIRC_PAL */
 		for (int i = 0; i < 99; i++) {
 			if (DIST(pixel, xirc_palette[i]) < delta) {
 				delta = DIST(pixel, xirc_palette[i]);
@@ -497,8 +520,8 @@ nearestcolor(float *pixel, int palette)
 	return color;
 }
 
-float
-huetorgb(float p, float q, float t)
+double
+huetorgb(double p, double q, double t)
 {
 	if (t < 0.0f) {
 		t += 1.0f;
@@ -584,9 +607,11 @@ usage(void)
 	fprintf(stderr, "-b percent     Adjust brightness levels, default is 100.\n");
 	fprintf(stderr, "-f a|d|e|m     Specify output format ANSI, DOS (ANSI with\n");
 	fprintf(stderr, "               CP437 characters), emoji or mirc.  Default is ANSI.\n");
-	fprintf(stderr, "-p m|v|x       Specify palette to use, mirc, VGA, or extended mirc.\n");
+	fprintf(stderr, "-p m|v|x       Specify palette to use, mirc, VGA, or extended mirc,\n");
 	fprintf(stderr, "               default is VGA.\n");
 	fprintf(stderr, "-s percent     Adjust saturation levels, default is 100.\n");
+	fprintf(stderr, "-t percent     Adjust transparency threshold of alpha channel,\n");
+	fprintf(stderr, "               default is 50.\n");
 	fprintf(stderr, "-w width       Specify output width, default is the image width.\n");
 	fprintf(stderr, "\n");
 	exit(1);

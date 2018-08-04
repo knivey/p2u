@@ -14,12 +14,16 @@ sudo make install
 ## Usage
 
 ```
-usage: p2a [options] input
+usage: p2u [options] input
 
 -b percent     Adjust brightness levels, default is 100.
--f a|m         Specify output format ANSI or mirc, default is ANSI.
--p m|v         Specify palette to use, mirc or VGA, default is VGA.
+-f a|d|e|m     Specify output format ANSI, DOS (ANSI with
+               CP437 characters), emoji or mirc.  Default is ANSI.
+-p m|v|x       Specify palette to use, mirc, VGA, or extended mirc,
+               default is VGA.
 -s percent     Adjust saturation levels, default is 100.
+-t percent     Adjust transparency threshold of alpha channel,
+               default is 50.
 -w width       Specify output width, default is the image width.
 ```
 
